@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono
 @Transactional
 @Service
 class MemberService(
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
 ) {
 
     fun saveAllMembers(members: Flux<Member>): Flux<Member> {

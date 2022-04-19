@@ -1,12 +1,10 @@
 package com.reactive.reactorstudy.member
 
-import org.springframework.data.annotation.Id
+import com.reactive.reactorstudy.global.common.EntityAuditing
 import org.springframework.data.relational.core.mapping.Table
 
 @Table("members")
 class Member(
-    @Id
-    val id: Long,
     var name: String,
     var age: Int
-)
+): EntityAuditing()

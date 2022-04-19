@@ -62,7 +62,7 @@ class MemberApi(
 
     @PostMapping("/v1/member")
     fun saveMember(): Mono<Member> {
-        val member = Member(10L, "jeancalm", 40)
+        val member = Member( "jeancalm", 30)
         return memberService.saveMember(member)
     }
 
@@ -72,7 +72,7 @@ class MemberApi(
         val members = mutableListOf<Member>()
 
         for (i in 1L..endIdx) {
-            members.add(Member(i, "name_$i", 10))
+            members.add(Member("name_$i", 10))
         }
         return members
     }
