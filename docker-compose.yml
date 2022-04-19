@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  mysql:
+    container_name: reactor_study
+    image: mysql/mysql-server:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: "reactor"
+      MYSQL_ROOT_PASSWORD: "wnsdud2"
+      TZ: "Asia/Seoul"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql
+    command:
+      - "mysqld"
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
