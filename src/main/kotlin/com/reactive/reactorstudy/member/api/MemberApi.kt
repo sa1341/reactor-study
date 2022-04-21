@@ -1,7 +1,11 @@
 package com.reactive.reactorstudy.member.api
 
-import com.reactive.reactorstudy.member.Member
+import com.reactive.reactorstudy.member.entity.Member
+import com.reactive.reactorstudy.member.entity.Team
+import com.reactive.reactorstudy.member.repository.TeamRedisRepository
 import com.reactive.reactorstudy.member.service.MemberService
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.http.ResponseEntity
 import org.springframework.util.StopWatch
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
@@ -10,7 +14,8 @@ import reactor.core.publisher.Mono
 @RequestMapping(value = ["/api"])
 @RestController
 class MemberApi(
-    private val memberService: MemberService
+    private val memberService: MemberService,
+    private val teamRedisRepository: TeamRedisRepository
 ) {
 
     @GetMapping(value = ["/v1/members"])
@@ -75,5 +80,12 @@ class MemberApi(
             members.add(Member("name_$i", 10))
         }
         return members
+    }
+
+    @PostMapping("/v1/redis")
+    fun setMember(@RequestBody team: Team): ResponseEntity<String> {
+        println("team name: ${team.name}")
+        teamRedisRepository.save(team)
+        return ResponseEntity.ok("success")
     }
 }

@@ -1,4 +1,4 @@
-package com.reactive.reactorstudy.member
+package com.reactive.reactorstudy.member.entity
 
 import com.reactive.reactorstudy.global.common.EntityAuditing
 import org.springframework.data.relational.core.mapping.Table
