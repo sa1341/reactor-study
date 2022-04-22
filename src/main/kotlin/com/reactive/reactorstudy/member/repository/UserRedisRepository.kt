@@ -1,7 +1,7 @@
 package com.reactive.reactorstudy.member.repository
 
-import com.reactive.reactorstudy.member.entity.Team
+import com.reactive.reactorstudy.member.entity.User
 import org.springframework.data.repository.CrudRepository
 
-interface TeamRedisRepository: CrudRepository<Team, String> {
+interface UserRedisRepository: CrudRepository<User, String> {
 }
