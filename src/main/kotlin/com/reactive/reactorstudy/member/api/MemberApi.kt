@@ -1,7 +1,6 @@
 package com.reactive.reactorstudy.member.api
 
 import com.reactive.reactorstudy.member.entity.Member
-import com.reactive.reactorstudy.member.repository.UserRedisRepository
 import com.reactive.reactorstudy.member.service.MemberService
 import org.springframework.util.StopWatch
 import org.springframework.web.bind.annotation.GetMapping
@@ -15,7 +14,6 @@ import reactor.core.publisher.Mono
 @RestController
 class MemberApi(
     private val memberService: MemberService,
-    private val userRedisRepository: UserRedisRepository
 ) {
 
     @GetMapping(value = ["/v1/members"])

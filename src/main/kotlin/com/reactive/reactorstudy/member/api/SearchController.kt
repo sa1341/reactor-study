@@ -4,6 +4,9 @@ import com.reactive.reactorstudy.member.entity.Account
 import com.reactive.reactorstudy.member.entity.Customer
 import com.reactive.reactorstudy.member.repository.AccountMongoRepository
 import com.reactive.reactorstudy.member.repository.CustomerRepository
+import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.aggregation.LookupOperation
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -15,7 +18,8 @@ import java.util.*
 @RestController
 class SearchController(
     private val accountMongoRepository: AccountMongoRepository,
-    private val customerRepository: CustomerRepository
+    private val customerRepository: CustomerRepository,
+    private val mongoTemplate: MongoTemplate
 ) {
 
     @PostMapping("/v1/account")
@@ -44,13 +48,16 @@ class SearchController(
     @GetMapping("/v1/account")
     fun getTradeList(): ResponseEntity<List<Account>> {
 
-        val optionalCustomer = customerRepository.findById("sa1341")
+        val lookup = LookupOperation.newLookup()
+            .from("customer")
+            .localField("id")
+            .foreignField("customerId")
+            .`as`("join_customer")
 
-        if (optionalCustomer.isPresent) {
-            val customer = optionalCustomer.get()
-            return ResponseEntity.ok(customer.accounts)
-        }
+        val newAggregation = Aggregation.newAggregation(lookup)
 
-        return ResponseEntity.ok(null)
+        val result = mongoTemplate.aggregate(newAggregation, "customer", Customer::class.java)
+
+        return ResponseEntity.ok(result.uniqueMappedResult?.accounts)
     }
 }
