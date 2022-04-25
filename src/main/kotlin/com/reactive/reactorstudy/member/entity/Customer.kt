@@ -1,13 +1,11 @@
 package com.reactive.reactorstudy.member.entity
 
 import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.DBRef
+import org.springframework.data.mongodb.core.mapping.Document
 
-class Customer {
-
+@Document(collation = "customer")
+class Customer(
     @Id
-    var id: String? = null
-
-    @DBRef(lazy = true)
-    var accounts = mutableListOf<Account>()
-}
+    val _id: String,
+    var name: String,
+)
