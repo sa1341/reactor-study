@@ -50,8 +50,8 @@ class SearchController(
 
         val newAggregation = Aggregation.newAggregation(lookup)
 
-        val result = mongoTemplate.aggregate(newAggregation, "customer", AccountCustomResult::class.java).mappedResults
+        val result = mongoTemplate.aggregate(newAggregation, "customer", AccountCustomResult::class.java).uniqueMappedResult
 
-        return ResponseEntity.ok(result[0])
+        return ResponseEntity.ok(result)
     }
 }
