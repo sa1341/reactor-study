@@ -14,7 +14,7 @@ class MySubscriber : Subscriber<Int> {
         log.info("구독자: 구독정보 잘받았음.")
         this.subscription = subscription
         log.info("구독자: 나 이제 신문 1개씩 줘")
-        subscription.request(2) // 신문 2개씩 발행 요청 - 한번에 받을 개수
+        subscription.request(2) // 신문 2개씩 발행 요청 - 한번에 받 을 개수
     }
 
     override fun onNext(t: Int?) {
