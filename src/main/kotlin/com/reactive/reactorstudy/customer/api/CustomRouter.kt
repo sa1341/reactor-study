@@ -1,23 +1,20 @@
 package com.reactive.reactorstudy.customer.api
 
-import com.reactive.reactorstudy.customer.domain.Customer
+import com.reactive.reactorstudy.customer.handler.CustomHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.server.RouterFunction
-import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
-import reactor.kotlin.core.publisher.toMono
 
 @Component
-class CustomRouter {
+class CustomRouter(
+    private val customHandler: CustomHandler
+) {
 
     @Bean
-    fun customerRoutes(): RouterFunction<*> = router {
+    fun customerRoutes() = router {
         "/functional".nest {
             "/customer".nest {
-                GET("/") {
-                    ServerResponse.ok().body(Customer(1, "functional web").toMono(), Customer::class.java)
-                }
+                GET("/", customHandler::get)
             }
         }
     }
