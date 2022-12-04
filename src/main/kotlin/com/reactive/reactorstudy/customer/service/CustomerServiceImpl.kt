@@ -3,6 +3,7 @@ package com.reactive.reactorstudy.customer.service
 import com.reactive.reactorstudy.customer.DataConfig
 import com.reactive.reactorstudy.customer.domain.Customer
 import com.reactive.reactorstudy.customer.domain.Telephone
+import com.reactive.reactorstudy.global.exception.CustomerExistException
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -24,7 +25,7 @@ class CustomerServiceImpl : CustomerService {
     private val customers = ConcurrentHashMap<Int,
             Customer>(initialCustomers.associateBy(Customer::id))
 
-    override fun getCustomer(id: Int) = customers[id]?.toMono()
+    override fun getCustomer(id: Int) = customers[id]?.toMono() ?: Mono.empty()
 
     override fun searchCustomers(nameFilter: String): Flux<Customer> {
         return customers.filter {
@@ -33,9 +34,13 @@ class CustomerServiceImpl : CustomerService {
     }
 
     override fun createCustomer(customerMono: Mono<Customer>): Mono<*> {
-        return customerMono.map {
-            customers[it.id] = it
-            it
+        return customerMono.flatMap {
+            if (customers[it.id] == null) {
+                customers[it.id] = it
+                it.toMono()
+            } else {
+                Mono.error(CustomerExistException("customer ${it.id} already exist"))
+            }
         }
     }
 }

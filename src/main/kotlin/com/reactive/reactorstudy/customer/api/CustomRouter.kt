@@ -14,7 +14,11 @@ class CustomRouter(
     fun customerRoutes() = router {
         "/functional".nest {
             "/customer".nest {
-                GET("/", customHandler::get)
+                GET("/{id}", customHandler::get)
+                POST("/", customHandler::create)
+            }
+            "/customers".nest {
+                GET("/", customHandler::search)
             }
         }
     }
