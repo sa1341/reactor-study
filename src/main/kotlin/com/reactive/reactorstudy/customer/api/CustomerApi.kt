@@ -13,6 +13,9 @@ class CustomerApi(
     private val customerService: CustomerService
 ) {
 
+    @GetMapping(value = ["/heath-check"])
+    fun ping() = "pong"
+
     @GetMapping(value = ["/customer/{id}"])
     fun getCustomer(@PathVariable id: Int): ResponseEntity<Mono<Customer>> {
         val customer = customerService.getCustomer(id)
