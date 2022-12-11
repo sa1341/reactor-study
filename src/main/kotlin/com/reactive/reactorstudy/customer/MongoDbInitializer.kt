@@ -1,19 +1,15 @@
-package com.reactive.reactorstudy.config
+package com.reactive.reactorstudy.customer
 
 import com.reactive.reactorstudy.customer.domain.Customer
 import com.reactive.reactorstudy.customer.domain.ReactiveCustomerRepository
 import com.reactive.reactorstudy.customer.domain.Telephone
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
 
 @Component
-class MongoDbInitializer {
+class MongoDbInitializer{
 
-    @Autowired
-    lateinit var reactiveCustomerRepository: ReactiveCustomerRepository
-
-    companion object {
+/*    companion object {
         val initialCustomers = listOf(
             Customer(1, "Kotlin"),
             Customer(2, "Spring"),
@@ -24,5 +20,5 @@ class MongoDbInitializer {
     @PostConstruct
     fun initData() {
         reactiveCustomerRepository.saveAll(initialCustomers)
-    }
+    }*/
 }

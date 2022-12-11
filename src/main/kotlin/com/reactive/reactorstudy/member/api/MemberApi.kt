@@ -1,7 +1,6 @@
 package com.reactive.reactorstudy.member.api
 
 import com.reactive.reactorstudy.member.entity.Member
-import com.reactive.reactorstudy.member.service.MemberService
 import org.springframework.util.StopWatch
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
+/*
 @RequestMapping(value = ["/api"])
 @RestController
 class MemberApi(
@@ -57,7 +57,8 @@ class MemberApi(
         return Flux.fromIterable(members)
     }
 
-    @PostMapping("/v1/members")
+ */
+/*   @PostMapping("/v1/members")
     fun saveMembers(): Flux<Member> {
         val members = getMembers()
         return memberService.saveAllMembers(Flux.fromIterable(members))
@@ -67,7 +68,8 @@ class MemberApi(
     fun saveMember(): Mono<Member> {
         val member = Member( "jeancalm", 30)
         return memberService.saveMember(member)
-    }
+    }*//*
+
 
     private fun getMembers(): MutableList<Member> {
 
@@ -80,3 +82,4 @@ class MemberApi(
         return members
     }
 }
+*/

@@ -22,7 +22,9 @@ spring:
     mongodb:
       host: localhost
       port: 27017
-      database: database
+      database: microservices
+  jackson:
+    default-property-inclusion: non_null
 
 logging:
   level:

@@ -18,9 +18,10 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	//implementation("org.springframework.boot:spring-boot-starter-web")
+	//implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+	//runtimeOnly("dev.miku:r2dbc-mysql")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
@@ -29,10 +30,10 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 	implementation ("org.springframework.boot:spring-boot-starter-data-mongodb")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
-	runtimeOnly("dev.miku:r2dbc-mysql")
 	runtimeOnly("mysql:mysql-connector-java")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
+	testImplementation("org.amshove.kluent:kluent:1.68")
 }
 
 tasks.withType<KotlinCompile> {

@@ -2,14 +2,13 @@ package com.reactive.reactorstudy.todo.api
 
 import com.reactive.reactorstudy.todo.dto.TodoDto
 import com.reactive.reactorstudy.todo.entity.TodoItem
-import com.reactive.reactorstudy.todo.service.TodoItemService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-@RequestMapping("/api/v1")
+/*@RequestMapping("/api/v1")
 @RestController
 class TodoApi(
     private val todoItemService: TodoItemService
@@ -35,4 +34,4 @@ class TodoApi(
         log.info("id: $id")
         return todoItemService.removeTodoItem(id)
     }
-}
+}*/
