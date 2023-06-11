@@ -1,15 +1,12 @@
 package com.reactive.reactorstudy.coroutine
 
-import kotlinx.coroutines.*
-import kotlin.system.measureTimeMillis
+import kotlinx.coroutines.* // ktlint-disable no-wildcard-imports
 
 /**
- * 원자성 위반 
- */
+ * 원자성 위반 */
 var counter = 0
 
 fun main() = runBlocking {
-
     val workerA = asyncIncrement(2000)
     val workerB = asyncIncrement(100)
 
@@ -23,10 +20,3 @@ fun asyncIncrement(by: Int) = GlobalScope.async {
         counter++
     }
 }
-
-
-
-
-
-
-

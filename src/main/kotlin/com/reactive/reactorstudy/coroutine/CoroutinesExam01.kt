@@ -1,9 +1,8 @@
-package com.reactive.reactorstudy.coroutine
+package com.reactive.reactorstudy.coroutine // ktlint-disable filename
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.* // ktlint-disable no-wildcard-imports
 
 fun main() = runBlocking {
-
     val deferred = async {
         delay(100)
         println("async start")
@@ -28,7 +27,3 @@ fun main() = runBlocking {
     delay(500)
     println(deferred.await())
 }
-
-
-
-

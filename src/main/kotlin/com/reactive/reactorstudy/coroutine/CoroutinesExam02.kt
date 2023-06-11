@@ -1,10 +1,9 @@
 package com.reactive.reactorstudy.coroutine
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.* // ktlint-disable no-wildcard-imports
 import kotlin.system.measureTimeMillis
 
 fun main() = runBlocking {
-    
     println("${Thread.activeCount()} threads active at the start")
 
     val time = measureTimeMillis {
@@ -16,7 +15,6 @@ fun main() = runBlocking {
 }
 
 suspend fun createCoroutines(amount: Int) {
-
     val jobs = ArrayList<Job>()
 
     for (i in 1..amount) {
@@ -31,7 +29,3 @@ suspend fun createCoroutines(amount: Int) {
         it.join()
     }
 }
-
-
-
-

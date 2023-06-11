@@ -17,7 +17,6 @@ class RouteConfig() {
 
     @Bean
     fun route(playerHandler: PlayHandler): RouterFunction<ServerResponse> {
-
         logger.info("Routing Start!!!!!!!")
 
         return RouterFunctions

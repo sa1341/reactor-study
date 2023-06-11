@@ -8,12 +8,11 @@ import java.util.concurrent.Executor
 
 @Configuration
 @EnableAsync
-class AsyncConfig: AsyncConfigurerSupport() {
+class AsyncConfig : AsyncConfigurerSupport() {
 
     override fun getAsyncExecutor(): Executor {
-
         val executor = ThreadPoolTaskExecutor()
-        executor.corePoolSize  = 5
+        executor.corePoolSize = 5
         executor.maxPoolSize = 10
         executor.setQueueCapacity(10)
         executor.setThreadNamePrefix("JEAN-CALM-")

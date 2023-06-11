@@ -1,10 +1,9 @@
 package com.reactive.reactorstudy.coroutine
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.* // ktlint-disable no-wildcard-imports
 import kotlin.system.measureTimeMillis
 
 fun main() = runBlocking {
-
     val time = measureTimeMillis {
         val name = async { getName() }
         val lastName = async { getLastName() }
@@ -23,10 +22,3 @@ suspend fun getLastName(): String {
     delay(1000)
     return "Minwan"
 }
-
-
-
-
-
-
-
