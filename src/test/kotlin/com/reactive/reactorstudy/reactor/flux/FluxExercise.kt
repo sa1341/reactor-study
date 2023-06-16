@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 private val log = KotlinLogging.logger {}
 
@@ -58,6 +60,28 @@ class FluxExercise {
             }.subscribe {
                 log.debug { "value: $it" }
             }
+    }
+
+    @Test
+    fun mergeSequenceTest() {
+        // given
+        val flux1 = Flux.range(1, 3)
+            .doOnSubscribe {
+                log.debug { "doOnSubscribe1" }
+            }.delayElements(Duration.ofMillis(100))
+
+        val flux2 = Flux.range(10, 3)
+            .doOnSubscribe {
+                log.debug { "doOnSubscribe2" }
+            }.delayElements(Duration.ofMillis(100))
+
+        // when
+        Flux.mergeSequential(flux1, flux2)
+            .doOnNext {
+                log.debug { "doOnNext: $it" }
+            }.subscribe()
+
+        TimeUnit.SECONDS.sleep(1)
     }
 
     private fun shouldDoOnError(t: Throwable): Int {
