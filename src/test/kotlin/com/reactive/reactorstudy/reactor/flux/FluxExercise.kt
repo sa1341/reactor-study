@@ -84,6 +84,115 @@ class FluxExercise {
         TimeUnit.SECONDS.sleep(1)
     }
 
+    @Test
+    fun fluxFilterTest() {
+        // given
+        Flux.range(1, 5)
+            .filter { it % 2 == 0 }
+            .doOnNext { log.debug { "doOnNext: $it" } }
+            .subscribe()
+    }
+
+    @Test
+    fun takeLastTest() {
+        // given
+        Flux.range(1, 10)
+            .takeLast(5)
+            .doOnNext { log.debug { "takeLast: $it" } }
+            .subscribe()
+    }
+
+    @Test
+    fun fluxSkipTest() {
+        // given
+        Flux.range(1, 10)
+            .skip(5)
+            .doOnNext { log.debug { "takeLast: $it" } }
+            .subscribe()
+    }
+
+    @Test
+    fun fluxSkipLastTest() {
+        // given
+        Flux.range(1, 10)
+            .skipLast(5)
+            .doOnNext { log.debug { "takeLast: $it" } }
+            .subscribe()
+    }
+
+    @Test
+    fun collectListTest() {
+        // given
+        Flux.range(1, 10)
+            .collectList()
+            .doOnNext { log.debug { "doOnNext: $it" } }
+            .subscribe()
+    }
+
+    @Test
+    fun cacheTest() {
+        // given
+        val flux = Flux.create<Int> {
+            for (i in 0..3) {
+                log.debug { "next: $i" }
+                it.next(i)
+            }
+            log.debug { "complete in publisher" }
+            it.complete()
+        }.cache()
+
+        flux.subscribe(
+            {
+                log.debug { "value: $it" }
+            },
+            null,
+            {
+                log.debug { "complete" }
+            }
+        )
+
+        flux.subscribe(
+            {
+                log.debug { "value: $it" }
+            },
+            null,
+            {
+                log.debug { "complete" }
+            }
+        )
+    }
+
+    @Test
+    fun flatMapTest() {
+        // given
+        Flux.range(1, 5)
+            .flatMap { value: Int ->
+                Flux.range(1, 2)
+                    .map { value2: Int -> "$value , $value2" }
+                    .publishOn(Schedulers.parallel())
+            }
+            .doOnNext { log.debug { "doOnNext: $it" } }
+            .subscribe()
+
+        TimeUnit.SECONDS.sleep(1)
+    }
+
+    @Test
+    fun deferContextualTest() {
+        // given
+        Flux.just(1)
+            .flatMap {
+                val value = it
+                Mono.deferContextual {
+                    val name = it.get<String>("name")
+                    log.debug { "name: $name" }
+                    Mono.just(value)
+                }
+            }.contextWrite {
+                it.put("name", "junyoung")
+            }.subscribe()
+    }
+
     private fun shouldDoOnError(t: Throwable): Int {
         log.error { "ERROR: $t" }
         return 1
