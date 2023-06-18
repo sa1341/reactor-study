@@ -2,8 +2,11 @@ package com.reactive.reactorstudy.reactor.flux
 
 import mu.KotlinLogging
 import org.junit.jupiter.api.Test
+import org.reactivestreams.Subscription
+import reactor.core.publisher.BaseSubscriber
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.publisher.Sinks
 import reactor.core.scheduler.Schedulers
 import java.time.Duration
 import java.util.concurrent.TimeUnit
@@ -191,6 +194,125 @@ class FluxExercise {
             }.contextWrite {
                 it.put("name", "junyoung")
             }.subscribe()
+    }
+
+    @Test
+    fun publishOnTest() {
+        // given
+        Flux.range(1, 10)
+            .doOnNext { log.info { "doOnNext: $it" } }
+            .publishOn(Schedulers.newSingle("pub"))
+            .subscribeOn(Schedulers.newSingle("sub"))
+            .subscribe {
+                log.info("value: $it ")
+            }
+
+        TimeUnit.SECONDS.sleep(1)
+    }
+
+    @Test
+    fun subscribeOnTest() {
+        // given
+        Flux.range(1, 10)
+            .doOnNext { log.info { "doOnNext: $it" } }
+            .subscribeOn(Schedulers.newSingle("sub"))
+            .subscribe {
+                log.info("value: $it ")
+            }
+
+        TimeUnit.SECONDS.sleep(1)
+    }
+
+    @Test
+    fun fluxSinkTest() {
+        // given
+        val tasks = 6
+        Flux.create<String> {
+            for (i in 1..tasks) {
+                it.next(doTask(i))
+            }
+        }
+            .subscribeOn(Schedulers.boundedElastic())
+            .doOnNext { log.debug { "# create(): $it" } }
+            .publishOn(Schedulers.parallel())
+            .map { "$it + success!" }
+            .doOnNext { log.debug { "# map(): $it" } }
+            .publishOn(Schedulers.parallel())
+            .subscribe {
+                log.debug { "# onNext: $it" }
+            }
+
+        TimeUnit.MILLISECONDS.sleep(500)
+    }
+
+    fun doTask(taskNumber: Int) = "task $taskNumber result"
+
+    @Test
+    fun unicastSinkTest() {
+        // given
+        val tasks = 6
+
+        val unicastSink: Sinks.Many<String> = Sinks.many().unicast()
+            .onBackpressureBuffer()
+
+        val fluxView = unicastSink.asFlux()
+
+        for (i in 1..tasks) {
+            try {
+                Thread {
+                    unicastSink.emitNext(
+                        doTask(i),
+                        Sinks.EmitFailureHandler.FAIL_FAST
+                    )
+                    log.info { "# emitted: $i" }
+                }.start()
+                TimeUnit.MILLISECONDS.sleep(100)
+            } catch (ie: InterruptedException) {
+                log.error { "${ie.message}" }
+            }
+        }
+
+        // when
+        fluxView
+            .publishOn(Schedulers.parallel())
+            .map { "$it + success!" }
+            .doOnNext { log.info { "# map(): $it" } }
+            .publishOn(Schedulers.parallel())
+            .subscribe {
+                log.info { "# onNext: $it" }
+            }
+
+        TimeUnit.MILLISECONDS.sleep(200)
+    }
+
+    @Test
+    fun backPressureTest() {
+        // given
+        Flux.range(1, 5)
+            .doOnRequest { log.debug { "# doOnRequest: $it" } }
+            .subscribe(object : BaseSubscriber<Int>() {
+                override fun hookOnSubscribe(subscription: Subscription) {
+                    request(1)
+                }
+
+                override fun hookOnNext(value: Int) {
+                    TimeUnit.SECONDS.sleep(1)
+                    log.info { "# hookOnNext: $value" }
+                    request(1)
+                }
+            })
+    }
+
+    @Test
+    fun parallelTest() {
+        // given
+        Flux.fromArray(arrayOf(1, 3, 5, 7, 9, 11, 13, 15, 17, 19))
+            .parallel()
+            .runOn(Schedulers.parallel())
+            .subscribe {
+                log.info { "# onNext: $it" }
+            }
+        TimeUnit.MILLISECONDS.sleep(100)
     }
 
     private fun shouldDoOnError(t: Throwable): Int {
