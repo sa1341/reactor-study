@@ -23,4 +23,5 @@ spring:
 
 logging:
   level:
+    com.reactive.reactorstudy: DEBUG
     org.springframework.r2dbc: DEBUG
