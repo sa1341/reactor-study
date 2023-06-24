@@ -6,6 +6,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Hooks
 import reactor.core.scheduler.Schedulers
 import java.util.concurrent.TimeUnit
+import java.util.logging.Level
 
 private val log = KotlinLogging.logger {}
 
@@ -38,10 +39,30 @@ class DebuggingExercise {
     }
 
     @Test
+    fun logTest() {
+        // given
+        Flux.fromArray(arrayOf("BANANAS", "APPLES", "PEARS", "MELONS"))
+            .map(String::lowercase)
+            .map { it.substring(0, it.length - 1) }
+            .log("Fruit.Substring", Level.FINE)
+            .map(fruits::get)
+            .log("Fruit.get", Level.FINE)
+            .subscribe(
+                {
+                    log.info { it }
+                },
+                {
+                    log.error { "# onError: $it" }
+                }
+            )
+    }
+
+    @Test
     fun checkPointTest() {
         // given
         Flux.just(2, 4, 6, 8)
             .zipWith(Flux.just(1, 2, 3, 0)) { a: Int, b: Int -> a / b }
+            .checkpoint()
             .map { it + 2 }
             .checkpoint()
             .subscribe(
