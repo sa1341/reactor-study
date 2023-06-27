@@ -57,6 +57,30 @@ class OperatorExercise01 {
         ).subscribe(log::info)
     }
 
+    @Test
+    fun skipTest() {
+        // given
+        Flux.interval(Duration.ofSeconds(1))
+            .skip(2)
+            .subscribe {
+                log.info { "# onNext: $it" }
+            }
+
+        TimeUnit.MILLISECONDS.sleep(5500)
+    }
+
+    @Test
+    fun skipDurationTest() {
+        // given
+        Flux.interval(Duration.ofMillis(300))
+            .skip(Duration.ofSeconds(1))
+            .subscribe {
+                log.info { "# onNext: $it" }
+            }
+
+        TimeUnit.MILLISECONDS.sleep(2000)
+    }
+
     companion object {
         fun sayDefault(): Mono<String> {
             log.info { "# Say Hi" }
