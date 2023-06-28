@@ -28,6 +28,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("io.github.microutils:kotlin-logging:2.1.23")
+    implementation("org.jsoup:jsoup:1.14.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.amshove.kluent:kluent:1.68")

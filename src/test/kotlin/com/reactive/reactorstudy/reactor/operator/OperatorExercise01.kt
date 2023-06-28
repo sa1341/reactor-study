@@ -81,6 +81,31 @@ class OperatorExercise01 {
         TimeUnit.MILLISECONDS.sleep(2000)
     }
 
+    @Test
+    fun `구구단 테스트`() {
+        // given
+        Flux.range(2, 8)
+            .flatMap {
+                val dan = it
+                Flux.range(1, 9)
+                    .map {
+                        "$dan * $it = ${dan * it}"
+                    }
+            }.subscribe {
+                log.info { "# onNext: $it" }
+            }
+    }
+
+    @Test
+    fun concatTest() {
+        // given
+        Flux
+            .concat(Flux.just(1, 2, 3), Flux.just(4, 5))
+            .subscribe {
+                log.info { "# onNext: $it" }
+            }
+    }
+
     companion object {
         fun sayDefault(): Mono<String> {
             log.info { "# Say Hi" }
