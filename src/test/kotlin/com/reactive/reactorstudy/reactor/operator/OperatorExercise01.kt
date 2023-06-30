@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.Duration
+import java.util.IllegalFormatException
 import java.util.concurrent.TimeUnit
 
 private val log = KotlinLogging.logger {}
@@ -106,10 +107,139 @@ class OperatorExercise01 {
             }
     }
 
+    @Test
+    fun andTest() {
+        // given
+        Mono.just("take1")
+            .delayElement(Duration.ofSeconds(1))
+            .doOnNext { log.info { "# doOnNext: $it" } }
+            .and {
+                Flux.just("take2", "take3")
+                    .delayElements(Duration.ofMillis(600))
+                    .doOnNext { log.info { "# doOnNext: $it" } }
+            }.subscribe(
+                {
+                    log.info { "# onNext: $it" }
+                },
+                {
+                    log.error { "# onError: $it" }
+                },
+                {
+                    log.info { "# onComplete" }
+                }
+            )
+    }
+
+    @Test
+    fun errorReturnTest() {
+        // given
+        Flux.fromIterable(listOf("blue pen", "red pen", null))
+            .map { it!!.uppercase() }
+            .onErrorReturn(NullPointerException::class.java, "no pen name")
+            .onErrorReturn(IllegalFormatException::class.java, "illegal pen name")
+            .subscribe {
+                log.info { "# onNext: $it" }
+            }
+    }
+
+    @Test
+    fun errorResumeTest() {
+        // given
+        val keyword = "java"
+        getBooksFromCache(keyword)
+            .onErrorResume {
+                getBooksFromDatabase(keyword)
+            }.subscribe(
+                {
+                    log.info { "# onNext: $it" }
+                },
+                {
+                    log.error { "# onError: $it" }
+                }
+            )
+    }
+
+    @Test
+    fun onErrorContinueTest() {
+        // given
+        Flux.just(1, 2, 4, 0, 6, 12)
+            .map { 12 / it }
+            .onErrorContinue { t, u ->
+                log.error { "error: ${t.message}, num: $u" }
+            }.subscribe(
+                {
+                    log.info { "# onNext: $it" }
+                },
+                {
+                    log.error { "# onError: $it" }
+                }
+            )
+    }
+
     companion object {
         fun sayDefault(): Mono<String> {
             log.info { "# Say Hi" }
             return Mono.just("Hi")
         }
+
+        fun getBooksFromCache(keyword: String): Flux<Book> {
+            return Flux.fromIterable(
+                getBooks()
+            ).filter {
+                it.name.contains(keyword)
+            }.switchIfEmpty {
+                Flux.error<RuntimeException>(NoSuchElementException("No such book"))
+            }
+        }
+
+        fun getBooksFromDatabase(keyword: String): Flux<Book> {
+            val books = getBooks().toMutableList()
+            books.add(
+                Book(
+                    name = "webflux",
+                    description = "reactive streams study",
+                    author = "john",
+                    alias = "reactive-streams",
+                    price = 32000,
+                    quantity = 120
+                )
+            )
+
+            return Flux.fromIterable(
+                books
+            ).filter {
+                it.name.contains(keyword)
+            }.switchIfEmpty {
+                Flux.error<RuntimeException>(NoSuchElementException("No such book"))
+            }
+        }
+
+        private fun getBooks() = listOf(
+            Book(
+                name = "DDD",
+                description = "Domain Driven Design",
+                author = "junyoung",
+                alias = "ddd-man",
+                price = 35000,
+                quantity = 200
+            ),
+            Book(
+                name = "Spring",
+                description = "Spring MVC",
+                author = "jean",
+                alias = "spring-man",
+                price = 30000,
+                quantity = 100
+            )
+        )
     }
 }
+
+data class Book(
+    val name: String,
+    val description: String,
+    val author: String,
+    val alias: String,
+    val price: Int,
+    val quantity: Int
+)
