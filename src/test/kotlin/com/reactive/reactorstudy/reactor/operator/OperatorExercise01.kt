@@ -1,12 +1,23 @@
 package com.reactive.reactorstudy.reactor.operator
 
+import com.jayway.jsonpath.JsonPath
 import mu.KotlinLogging
 import org.junit.jupiter.api.Test
+import org.reactivestreams.Subscription
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
+import org.springframework.web.client.RestTemplate
+import org.springframework.web.util.UriComponentsBuilder
+import reactor.core.publisher.BaseSubscriber
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.util.function.Tuples
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.Duration
+import java.util.Collections
 import java.util.IllegalFormatException
 import java.util.concurrent.TimeUnit
 
@@ -174,6 +185,159 @@ class OperatorExercise01 {
                     log.error { "# onError: $it" }
                 }
             )
+    }
+
+    @Test
+    fun retryTest() {
+        // given
+        val count = arrayOf(1)
+        Flux.range(1, 3)
+            .delayElements(Duration.ofSeconds(1))
+            .map {
+                if (it == 3 && count[0] == 1) {
+                    count[0]++
+                    TimeUnit.SECONDS.sleep(1)
+                }
+                it
+            }
+            .timeout(Duration.ofMillis(1500))
+            .retry(1)
+            .subscribe(
+                {
+                    log.info { "# onNext: $it" }
+                },
+                {
+                    log.error { "# onError: $it" }
+                },
+                {
+                    log.info { "# onComplete" }
+                }
+            )
+
+        TimeUnit.SECONDS.sleep(7)
+    }
+
+    @Test
+    fun elapsedTest() {
+        // given
+        Flux.range(1, 5)
+            .delayElements(Duration.ofSeconds(1))
+            .elapsed()
+            .subscribe {
+                log.info { "# onNext: $it" }
+            }
+
+        TimeUnit.SECONDS.sleep(6)
+    }
+
+    @Test
+    fun apiRepeatAndElapsedTest() {
+        // given
+        val worldTimeUrl = UriComponentsBuilder.newInstance().scheme("http")
+            .host("worldtimeapi.org")
+            .port(80)
+            .path("/api/timezone/Asia/Seoul")
+            .build()
+            .encode()
+            .toUri()
+
+        val restTemplate = RestTemplate()
+        val headers = HttpHeaders()
+        headers.accept = Collections.singletonList(MediaType.APPLICATION_JSON)
+
+        // when
+        Mono.defer {
+            Mono.just(
+                restTemplate.exchange(
+                    worldTimeUrl,
+                    HttpMethod.GET,
+                    HttpEntity<String>(headers),
+                    String::class.java
+                )
+            )
+        }.repeat(4)
+            .elapsed()
+            .map {
+                val jsonContext = JsonPath.parse(it.t2.body)
+                val dateTime = jsonContext.read<String>("$.datetime")
+                Tuples.of(dateTime, it.t1)
+            }.subscribe(
+                {
+                    log.info { "now: ${it.t1}, elapsed: ${it.t2}" }
+                },
+                {
+                    log.error { "# onError: $it" }
+                },
+                {
+                    log.info { "# onComplete" }
+                }
+            )
+    }
+
+    @Test
+    fun windowTest() {
+        // given
+        Flux.range(1, 11)
+            .window(3)
+            .flatMap {
+                log.info { "=====================" }
+                it
+            }.subscribe(object : BaseSubscriber<Int>() {
+
+                override fun hookOnSubscribe(subscription: Subscription) {
+                    subscription.request(2)
+                }
+
+                override fun hookOnNext(value: Int) {
+                    log.info { "# onNext: $value" }
+                    request(2)
+                }
+            })
+    }
+
+    @Test
+    fun bufferTest() {
+        // given
+        Flux.range(1, 95)
+            .buffer(10)
+            .subscribe {
+                log.info { "# onNext: $it" }
+            }
+
+        Flux.range(1, 20)
+            .map {
+                if (it < 10) {
+                    TimeUnit.MILLISECONDS.sleep(100)
+                } else {
+                    TimeUnit.MILLISECONDS.sleep(300)
+                }
+                it
+            }.bufferTimeout(3, Duration.ofMillis(400))
+            .subscribe {
+                log.info { "# onNext: $it" }
+            }
+    }
+
+    @Test
+    fun refCountTest() {
+        // given
+        val publisher = Flux
+            .interval(Duration.ofMillis(500))
+            .publish()
+            .refCount(1)
+
+        val disposable = publisher.subscribe {
+            log.info { "# subscriber 1: $it" }
+        }
+
+        TimeUnit.MILLISECONDS.sleep(2100)
+        disposable.dispose()
+
+        publisher.subscribe {
+            log.info { "# subscriber 2: $it" }
+        }
+
+        TimeUnit.SECONDS.sleep(2500)
     }
 
     companion object {
