@@ -1,0 +1,27 @@
+spring:
+  r2dbc:
+    url: r2dbc:mysql://127.0.0.1:3306/reactor?useSSL=false&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul
+    username: reactor
+    password: wnsdud2
+    pool:
+      max-size: 10
+      validation-query: SELECT 1
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  redis:
+    host: localhost
+    port: 6379
+  jackson:
+    default-property-inclusion: non_null
+
+logging:
+  level:
+    com.reactive.reactorstudy: DEBUG
+    org.springframework.r2dbc: DEBUG

@@ -1,0 +1,12 @@
+POST localhost:8080/books
+Content-Type: application/json;
+
+{
+  "id": 1,
+  "titleKoran": "햇님달님",
+  "titleEnglish": "sun and moon",
+  "description": "우솝이화임",
+  "author": "임준영",
+  "isbn": "1",
+  "publishDate": "2023-07-07"
+}

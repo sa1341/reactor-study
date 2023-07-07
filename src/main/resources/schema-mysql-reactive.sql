@@ -1,5 +1,4 @@
-create table members
-(
+create table members (
     id bigint not null auto_increment,
     name varchar(255)   not null,
     age bigint not null,
